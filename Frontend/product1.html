@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Management</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+</head>
+<body>
+
+    <h2>Product Management</h2>
+
+    <form id="productForm">
+        <input type="hidden" id="productId" />
+
+        <label>Product Name</label><br>
+        <input type="text" id="productName" required /><br><br>
+
+        <label>Product Code</label><br>
+        <input type="text" id="productCode" required /><br><br>
+
+        <label>Category</label><br>
+        <select id="categoryId"></select><br><br>
+
+        <label>Brand</label><br>
+        <select id="brandId"></select><br><br>
+
+        <label>Price</label><br>
+        <input type="number" id="price" required /><br><br>
+
+        <label>Mfg Date</label><br>
+        <input type="date" id="mfgDate" required /><br><br>
+
+        <label>Expiry Date</label><br>
+        <input type="date" id="expiryDate" /><br><br>
+
+        <button type="submit">Save Product</button>
+    </form>
+
+    <hr>
+
+    <table border="1" width="100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Price</th>
+                <th>Mfg Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="productTable"></tbody>
+    </table>
+
+    <script src="Product.js"></script>
+</body>
+</html>
+
+
+
+const API = "https://localhost:7182/api";
+let editingId = 0;
+
+
+$(document).ready(function () {
+    console.log("READY");
+
+    loadCategories();
+    loadBrands();
+    loadProducts();
+});
+
+/* ---------- LOAD DROPDOWNS 001---------- */
+function loadCategories() {
+    $.get(`${API}/category`, function (data) {
+        $("#categoryId").empty();
+        data.forEach(c =>
+            $("#categoryId").append(`<option value="${c.category_Id}">${c.category_Name}</option>`)
+        );
+    });
+}
+
+function loadBrands() {
+    $.get(`${API}/brand`, function (data) {
+        $("#brandId").empty();
+        data.forEach(b =>
+            $("#brandId").append(`<option value="${b.brand_Id}">${b.brand_Name}</option>`)
+        );
+    });
+}
+
+/* ---------- LOAD PRODUCTS ---------- */
+function loadProducts() {
+
+    console.log("Calling product API");
+
+    $.get(`${API}/product`, function (data) {
+        let rows = "";
+        data.forEach(p => {
+            rows += `
+                <tr>
+                    <td>${p.product_Name}</td>
+                    <td>${p.product_Code}</td>
+                    <td>${p.category.category_Name}</td>
+                    <td>${p.brand.brand_Name}</td>
+                    <td>${p.price}</td>
+                    <td>${p.mfg_Date}</td>
+                    <td>
+                        <button onclick="editProduct(${p.product_Id})">Edit</button>
+                        <button onclick="deleteProduct(${p.product_Id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+        });
+        $("#productTable").html(rows);
+    });
+}
+
+/* ---------- SAVE PRODUCT 002---------- */
+$("#productForm").submit(function (e) {
+    e.preventDefault();
+
+    const data = {
+        product_Id: editingId,
+        product_Name: $("#productName").val(),
+        product_Code: $("#productCode").val(),
+        category_Id: $("#categoryId").val(),
+        brand_Id: $("#brandId").val(),
+        price: $("#price").val(),
+        mfg_Date: formatDate($("#mfgDate").val()),
+        expiry_Date: $("#expiryDate").val()
+            ? formatDate($("#expiryDate").val())
+            : null
+    };
+
+    $.ajax({
+        url: `${API}/product`,
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function () {
+            alert("Saved!");
+            editingId = 0;
+            $("#productForm")[0].reset();
+            loadProducts();
+        }
+    });
+});
+
+/* ---------- EDIT 003---------- */
+function editProduct(id) {
+    $.get(`${API}/product/${id}`, function (p) {
+        editingId = p.product_Id;
+        $("#productName").val(p.product_Name);
+        $("#productCode").val(p.product_Code);
+        $("#categoryId").val(p.category.category_Id);
+        $("#brandId").val(p.brand.brand_Id);
+        $("#price").val(p.price);
+        $("#mfgDate").val(toISO(p.mfg_Date));
+    });
+}
+
+/* ---------- DELETE 004 ---------- */
+function deleteProduct(id) {
+    if (!confirm("Delete this product?")) return;
+
+    $.ajax({
+        url: `${API}/product/${id}`,
+        type: "DELETE",
+        success: loadProducts
+    });
+}
+
+/* ---------- DATE HELPERS 000---------- */
+function formatDate(date) {
+    const d = new Date(date);
+    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+}
+
+function toISO(ddmmyyyy) {
+    const [d, m, y] = ddmmyyyy.split("/");
+    return `${y}-${m}-${d}`;
+}
