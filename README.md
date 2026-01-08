@@ -27,3 +27,20 @@ A full-stack web application for managing employee information with a modern int
 - **Frontend**: HTML, CSS, JavaScript
 - **Database**: SQL Server
 - **Version Control**: Git, GitHub
+
+## 📁 Project Structure
+```
+Employee-Management-System/
+├── Backend/
+│ ├── Controllers/ # API controllers
+│ ├── Models/ # Data models (Employee, Department, Roles)
+│ ├── DTOs/ # Data Transfer Objects
+│ ├── Properties/ # Application properties
+│ └── appsettings.json # Configuration
+├── Frontend/
+│ ├── Index.html # Main dashboard
+│ ├── add.html # Add employee form
+│ └── app.js # Frontend JavaScript
+└── Database/
+└── EmployeeManagement.sql # Database schema
+```
