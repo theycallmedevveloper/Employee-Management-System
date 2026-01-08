@@ -6,7 +6,8 @@ namespace EmployeeManagementSystem.Models
     {
         [Key]
         public int DepartmentId { get; set; }
-        public string? DepartmentName { get; set; }
-        public bool? IsActive { get; set; }
+        public string DepartmentName { get; set; } = null!;
+        public bool IsActive { get; set; }
+        public ICollection<Role> Roles { get; set; } = new List<Role>();
     }
 }

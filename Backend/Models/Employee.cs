@@ -15,7 +15,7 @@ namespace EmployeeManagementSystem.Models
         public string EmpEmail { get; set; } = null!;
 
         [Column("EmpPhone")]
-        public string EmpPhone { get; set; } = null!;
+        public string? EmpPhone { get; set; }  // Now nullable for real
 
         [Column("EmpSalary")]
         public decimal? EmpSalary { get; set; }
@@ -30,7 +30,6 @@ namespace EmployeeManagementSystem.Models
 
         public int? ManagerId { get; set; }
         public Employee? Manager { get; set; }
-        
 
         public DateTime? CreatedAt { get; set; }
         public bool? IsActive { get; set; }

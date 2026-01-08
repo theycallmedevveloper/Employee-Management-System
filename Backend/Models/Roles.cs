@@ -8,6 +8,9 @@ namespace EmployeeManagementSystem.Models
         public int RoleId { get; set; }
         public string? RoleName { get; set; }
         public bool? IsActive { get; set; }
+
+        public int DepartmentId { get; set; }
+        public Department Department { get; set; } = null!;
     }
 }
         
