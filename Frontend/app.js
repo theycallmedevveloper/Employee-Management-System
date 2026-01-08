@@ -200,7 +200,7 @@ if (employeeForm) {
 
         try {
             const phone = document.getElementById('phone').value;
-
+            // number validation
             if (phone && !/^\d{10}$/.test(phone)) {
                 alert("Mobile number must be exactly 10 digits");
                 submitBtn.disabled = false;
